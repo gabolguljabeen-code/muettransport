@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MUET Point Track — Mehran University Transport Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="logo-box">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+            <path d="M6 6h10"/>
+            <path d="M6 10h10"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">MUET POINT TRACK <span class="badge-jamshoro">JAMSHORO</span></div>
+          <div class="brand-sub">Mehran University of Engineering & Technology • Transit Management System</div>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-btn active" data-tab="tab-tracking">📍 Live Tracking</button>
+        <button class="nav-btn" data-tab="tab-driver">🚍 Driver Cockpit</button>
+        <button class="nav-btn" data-tab="tab-pass">🪪 Student Pass</button>
+        <button class="nav-btn" data-tab="tab-schedules">📅 Timetable</button>
+        <button class="nav-btn" data-tab="tab-admin">📊 Fleet Admin</button>
+      </nav>
+
+      <div class="header-status">
+        <span class="status-pulse"></span>
+        <span class="status-text">FLEET LIVE GPS</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Notice / Delay Ticker -->
+  <section class="alert-ticker" id="alertTicker">
+    <div class="ticker-content">
+      <span class="ticker-badge">⚠️ TRAFFIC ALERT</span>
+      <span id="tickerText">Jamshoro Old Bridge: Slow moving heavy traffic approaching Toll Plaza. Expect +8-10 min delay for Points 27 & 23.</span>
+    </div>
+  </section>
+
+  <!-- Main Container -->
+  <main class="main-content">
+    
+    <!-- Tab 1: Live Tracking & Map -->
+    <div id="tab-tracking" class="tab-pane active">
+      <div class="grid-layout">
+        <!-- Left: Active Buses Column -->
+        <div class="column-sidebar">
+          <div class="card-box">
+            <div class="card-header">
+              <h3>Active MUET Points</h3>
+              <span class="count-badge" id="activePointCount">4 On Route</span>
+            </div>
+            <div class="bus-list" id="busList">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Quick Request Card -->
+          <div class="card-box request-banner-card">
+            <h4>Need a Pickup or Drop-Off?</h4>
+            <p>Request your stop checkpoint so your Point driver is notified before arrival.</p>
+            <button class="btn btn-primary" id="openRequestModalBtn">Request Stop Point</button>
+          </div>
+        </div>
+
+        <!-- Center/Right: Map & Selected Point Details -->
+        <div class="column-main">
+          <!-- Live Interactive Canvas Map -->
+          <div class="card-box map-card">
+            <div class="map-header">
+              <div class="map-title-group">
+                <h3>Hyderabad – Jamshoro Live Transit Corridor</h3>
+                <span class="map-sub">Indus River • Jamshoro Bridge • M-9 Bypass • MUET Campus</span>
+              </div>
+              <div class="map-legend">
+                <span class="legend-item"><span class="dot river"></span> River Indus</span>
+                <span class="legend-item"><span class="dot bus"></span> Active Bus</span>
+                <span class="legend-item"><span class="dot campus"></span> Campus Stop</span>
+              </div>
+            </div>
+            <div class="canvas-wrapper">
+              <canvas id="hyderabadMapCanvas" width="800" height="420"></canvas>
+            </div>
+          </div>
+
+          <!-- Selected Point Details View -->
+          <div class="card-box" id="selectedBusDetails">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Driver Cockpit -->
+    <div id="tab-driver" class="tab-pane">
+      <div class="driver-container">
+        <div class="card-box driver-hero">
+          <div class="driver-hero-header">
+            <div>
+              <span class="cockpit-tag">DRIVER COCKPIT</span>
+              <h2 id="driverBusName">Point 27 (EB-0109)</h2>
+              <p id="driverRouteName">Route 1: Latifabad / Qasimabad to MUET</p>
+            </div>
+            <div class="driver-selector-box">
+              <label>Select Your Assigned Point:</label>
+              <select id="driverPointSelect" class="styled-select">
+                <option value="POINT_27">Point 27 (Ustad Ghulam Rasool)</option>
+                <option value="POINT_23">Point 23 (Ustad Allah Dino)</option>
+                <option value="POINT_30">Point 30 (Ustad Muhammad Ismail)</option>
+                <option value="POINT_14">Point 14 (Ustad Tariq Brohi)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="driver-grid">
+          <!-- Seat Controller -->
+          <div class="card-box seat-control-card">
+            <h3>Live Seat Availability Controller</h3>
+            <p>Update passenger load in real-time for waiting students across Hyderabad.</p>
+
+            <div class="seat-stats-row">
+              <div class="seat-stat">
+                <span class="seat-num" id="driverOccupiedSeats">38</span>
+                <span class="seat-label">Occupied Seats</span>
+              </div>
+              <div class="seat-stat highlight">
+                <span class="seat-num" id="driverAvailableSeats">14</span>
+                <span class="seat-label">Seats Available (of 52)</span>
+              </div>
+              <div class="seat-stat">
+                <span class="seat-num" id="driverStandingSeats">4</span>
+                <span class="seat-label">Standing</span>
+              </div>
+            </div>
+
+            <div class="seat-progress-bar">
+              <div class="seat-progress-fill" id="driverSeatFill" style="width: 73%;"></div>
+            </div>
+
+            <div class="seat-buttons-grid">
+              <button class="btn btn-secondary" onclick="updateDriverSeats(-5, 0)">-5 Seats</button>
+              <button class="btn btn-secondary" onclick="updateDriverSeats(-1, 0)">-1 Seat</button>
+              <button class="btn btn-primary" onclick="updateDriverSeats(1, 0)">+1 Seat</button>
+              <button class="btn btn-primary" onclick="updateDriverSeats(5, 0)">+5 Seats</button>
+            </div>
+
+            <div class="preset-buttons">
+              <button class="preset-btn green" onclick="setDriverPreset('AVAILABLE')">🟢 Vacant / Plenty Seats</button>
+              <button class="preset-btn yellow" onclick="setDriverPreset('MODERATE')">🟡 Moderate Capacity</button>
+              <button class="preset-btn red" onclick="setDriverPreset('FULL')">🔴 Bus Full</button>
+            </div>
+          </div>
+
+          <!-- Route Progress & Actions -->
+          <div class="card-box route-control-card">
+            <h3>Route Checkpoint & Alerts</h3>
+            
+            <div class="current-checkpoint-box">
+              <div class="cp-label">CURRENT STOP</div>
+              <div class="cp-val" id="driverCurrentStop">Qasim Chowk</div>
+              <div class="cp-next">Next Stop: <strong id="driverNextStop">Naseem Nagar</strong></div>
+              <button class="btn btn-accent btn-large" onclick="advanceDriverStop()">Depart / Arrive Next Stop →</button>
+            </div>
+
+            <div class="broadcast-trigger-box">
+              <h4>Encountering Traffic or Delay?</h4>
+              <p>Broadcast a notice for students waiting on your route.</p>
+              <button class="btn btn-warning" id="openBroadcastModalBtn">📢 Broadcast Delay Notice</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Passenger Requests Feed -->
+        <div class="card-box" style="margin-top: 1.5rem;">
+          <div class="card-header">
+            <h3>Student Boarding & Stop Requests for This Point</h3>
+            <span class="count-badge" id="driverRequestCount">1 Request</span>
+          </div>
+          <div id="driverRequestList" class="request-feed-list">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Student Boarding Pass -->
+    <div id="tab-pass" class="tab-pane">
+      <div class="pass-container">
+        <div class="digital-pass-card">
+          <div class="pass-header">
+            <div class="pass-brand">
+              <div class="muet-emblem">MUET</div>
+              <div>
+                <h2>MEHRAN UNIVERSITY</h2>
+                <div class="pass-sub">OF ENGINEERING & TECHNOLOGY, JAMSHORO</div>
+              </div>
+            </div>
+            <div class="verified-tag">✓ VERIFIED PASS</div>
+          </div>
+
+          <div class="pass-body">
+            <div class="student-profile-row">
+              <div class="student-avatar">🎓</div>
+              <div>
+                <h3 id="passStudentName">Gul Jabeen Gabol</h3>
+                <div class="student-roll">Roll No: <span id="passRollNo">21SW089</span></div>
+                <div class="student-dept" id="passDept">Department of Software Engineering</div>
+              </div>
+            </div>
+
+            <div class="pass-details-grid">
+              <div class="pass-field">
+                <span class="label">ASSIGNED ROUTE</span>
+                <span class="val" id="passRouteName">Route 1: Latifabad / Qasimabad</span>
+              </div>
+              <div class="pass-field">
+                <span class="label">DESIGNATED STOP</span>
+                <span class="val highlight" id="passStop">Qasim Chowk</span>
+              </div>
+              <div class="pass-field">
+                <span class="label">FEE RECEIPT TOKEN</span>
+                <span class="val" id="passToken">TR-88921-MUET</span>
+              </div>
+              <div class="pass-field">
+                <span class="label">VALID UNTIL</span>
+                <span class="val" id="passExpiry">31-Dec-2026</span>
+              </div>
+            </div>
+
+            <div class="qr-container">
+              <canvas id="qrCodeCanvas" width="180" height="180"></canvas>
+              <div class="qr-caption">Scan at Point Conductor Entry Gate • Fall 2026</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transport Directorate Emergency -->
+        <div class="sos-banner">
+          <div class="sos-icon">🚨</div>
+          <div class="sos-text">
+            <strong>Directorate of Transport Control Hotline</strong>
+            <span>Jamshoro Campus Office: +92 22 2772250 • Available 06:30 AM – 08:00 PM for breakdown & security support.</span>
+          </div>
+          <button class="btn btn-danger" onclick="triggerSos()">SOS HELPLINE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Schedules & Shifts -->
+    <div id="tab-schedules" class="tab-pane">
+      <div class="schedules-container">
+        <div class="schedule-header-card">
+          <h2>MUET Jamshoro & Hyderabad Point Schedules</h2>
+          <p>Official departure and arrival times across morning, afternoon, and evening shifts.</p>
+
+          <div class="shift-chips">
+            <button class="shift-chip active" onclick="switchShift('MORNING')">🌅 Morning (07:15 AM Departure)</button>
+            <button class="shift-chip" onclick="switchShift('AFTERNOON')">☀️ Return (01:45 PM Departure)</button>
+            <button class="shift-chip" onclick="switchShift('EVENING')">🌆 Evening (05:15 PM Departure)</button>
+          </div>
+        </div>
+
+        <div class="routes-grid" id="routesGrid">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 5: Admin Fleet Command -->
+    <div id="tab-admin" class="tab-pane">
+      <div class="admin-container">
+        <div class="card-box admin-hero">
+          <h2>Fleet Command & Operational Efficiency Center</h2>
+          <p>Directorate of Transport, Mehran University • Jamshoro Main Campus</p>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-title">Active Points on Route</div>
+            <div class="kpi-num" id="adminActivePoints">4 / 4</div>
+            <div class="kpi-sub">100% corridor coverage</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Fleet Capacity Load</div>
+            <div class="kpi-num" id="adminCapacity">79%</div>
+            <div class="kpi-sub">159 of 208 seats occupied</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">On-Time Performance</div>
+            <div class="kpi-num" style="color: #10B981;">94.8%</div>
+            <div class="kpi-sub">Average delay: +3.2 mins</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Daily Distance Covered</div>
+            <div class="kpi-num" style="color: #F59E0B;">648 km</div>
+            <div class="kpi-sub">4.2 km/L fleet fuel index</div>
+          </div>
+        </div>
+
+        <!-- Fleet Table -->
+        <div class="card-box">
+          <h3>Fleet Deployment Status</h3>
+          <div class="table-responsive">
+            <table class="styled-table">
+              <thead>
+                <tr>
+                  <th>Point</th>
+                  <th>Plate #</th>
+                  <th>Assigned Route</th>
+                  <th>Driver Name</th>
+                  <th>Live Location</th>
+                  <th>Occupancy</th>
+                  <th>Speed</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="adminFleetTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Stop Request Modal Dialog -->
+  <div class="modal-overlay" id="requestModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Request Pickup or Drop-Off Stop</h3>
+        <button class="modal-close" id="closeRequestModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Request Type:</label>
+          <div class="radio-row">
+            <label><input type="radio" name="reqType" value="PICKUP" checked> 🚏 Morning Pickup</label>
+            <label><input type="radio" name="reqType" value="DROP_OFF"> 🏠 Evening Drop-off</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Target MUET Point:</label>
+          <select id="modalPointSelect" class="styled-select">
+            <option value="POINT_27">Point 27 (Route 1: Latifabad / Qasimabad)</option>
+            <option value="POINT_23">Point 23 (Route 2: Saddar / Thandi Sarak)</option>
+            <option value="POINT_30">Point 30 (Route 3: Auto Bhan & Citizen)</option>
+            <option value="POINT_14">Point 14 (Route 4: Kotri / Al-Manzar)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Designated Stop Point:</label>
+          <select id="modalStopSelect" class="styled-select">
+            <option value="Qasim Chowk">Qasim Chowk (Main Roundabout)</option>
+            <option value="Auto Bhan Towers">Auto Bhan Towers</option>
+            <option value="Naseem Nagar Chowk">Naseem Nagar Chowk</option>
+            <option value="Wadhu Wah Phir">Wadhu Wah Phir</option>
+            <option value="Sheedi Goth Cut">Sheedi Goth Cut</option>
+            <option value="Latifabad Unit 7">Latifabad Unit 7</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Note for Driver (Optional):</label>
+          <input type="text" id="modalNoteInput" class="styled-input" placeholder="e.g. Waiting near pharmacy entrance with 2 students">
+        </div>
+
+        <button class="btn btn-primary btn-block" id="submitRequestBtn">Send Request to Point Driver</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delay Broadcast Modal -->
+  <div class="modal-overlay" id="broadcastModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Broadcast Delay / Traffic Notice</h3>
+        <button class="modal-close" id="closeBroadcastModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Quick Delay Presets:</label>
+          <div class="preset-chips">
+            <button class="chip" onclick="setBroadcastPreset('Jamshoro Old Bridge Congestion', 'Heavy truck movement causing +12 min delay approaching Jamshoro Toll.')">Jamshoro Bridge Jam</button>
+            <button class="chip" onclick="setBroadcastPreset('Indus Highway Roadwork', 'Road repair near Sheedi Goth. Point moving at reduced speed (+15 mins).')">Highway Roadwork</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Notice Title:</label>
+          <input type="text" id="broadcastTitleInput" class="styled-input" value="Jamshoro Bridge Traffic Delay">
+        </div>
+
+        <div class="form-group">
+          <label>Announcement Message:</label>
+          <textarea id="broadcastMsgInput" class="styled-textarea" rows="3">Heavy traffic queue at Jamshoro Toll Plaza. Point delayed by +10 minutes.</textarea>
+        </div>
+
+        <button class="btn btn-warning btn-block" id="submitBroadcastBtn">Broadcast to All Students</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

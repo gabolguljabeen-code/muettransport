@@ -1,0 +1,6 @@
+{
+  "name": "MUET Point Track",
+  "description": "Smart university shuttle tracking and fleet management system for Mehran University of Engineering and Technology (MUET Jamshoro/Hyderabad) with live GPS route tracking, digital boarding passes, driver seat controls, and admin analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
